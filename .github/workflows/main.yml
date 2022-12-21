@@ -21,7 +21,7 @@ jobs:
 
       - name: Generate build
         uses: dagger/dagger-for-github@v3
-                with:
+        with:
           version: 0.2
           cmds: |
                 project update
