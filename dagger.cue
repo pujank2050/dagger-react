@@ -1,54 +1,34 @@
-package main
+package dagger-react
 
 import (
-    "dagger.io/dagger"
-    "gitlab.com/hazelcomb/swordcoat/test"
+	"dagger.io/dagger"
+
+	"dagger.io/dagger/core"
+	"universe.dagger.io/yarn"
 )
 
 dagger.#Plan & {
-    client: {
-        filesystem: project: read: {  
-            path: "."  
-            contents: dagger.#FS
-            exclude: [
-                ".vscode",
-                "cue.mod",
-                "opt",
-                ".gitlab-ci.yml",
-                "example.cue",
-                "LICENSE",
-                "README"
-            ]
-        }
-        network: {
-            unixDocker: {
-                address: "unix:///var/run/docker.sock"
-                connect: dagger.#Socket
-            }
-            windowsDocker: {
-                address: "npipe:////./pipe/docker_engine"
-                connect: dagger.#Socket
-            }
-        }
-    }
+	actions: {
+		source: core.#Source & {
+			path: "."
+			exclude: [
+				"node_modules",
+				"build",
+				"*.cue",
+				"*.md",
+				".git",
+			]
+		}
 
-    actions: {
-        init: test.#Environment & {
-            src: client.filesystem.project.read.contents
-        }
+		build: yarn.#Script & {
+			name:   "build"
+			source: actions.source.output
+		}
 
-        windows: test.#Run & {
-            socket: client.network.windowsDocker.connect
-            input: init.image.output
-            variables: init.variables
-            src: init.source.output
-        }
-
-        unix: test.#Run & {
-            socket: client.network.unixDocker.connect
-            input: init.image.output
-            variables: init.variables
-            src: init.source.output
-        }
-    }
+		test: yarn.#Script & {
+			name:   "test"
+			source: actions.source.output
+			container: env: CI: "true"
+		}
+	}
 }
