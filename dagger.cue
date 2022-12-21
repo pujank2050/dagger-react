@@ -1,4 +1,4 @@
-package todoapp
+package dagger-react
 
 import (
 	"dagger.io/dagger"
