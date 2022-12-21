@@ -17,8 +17,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: install node 
+        uses: actions/setup-node@v3
         with:
           node-version: 18
-      - run: npm install
-      - run: node --loader ts-node/esm ./build.ts
+      - name: npm install, build, and test
+        run: |
+          npm install
+          node --loader ts-node/esm ./build.ts
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: |
+            build
