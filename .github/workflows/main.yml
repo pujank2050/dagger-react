@@ -21,14 +21,24 @@ jobs:
 
       - name: Generate build
         uses: dagger/dagger-for-github@v3
+                with:
+          version: 0.2
+          cmds: |
+                project update
+                do build
+    # Artifact name
+          name: artifact# optional, default is artifact
+    # A file, directory or wildcard pattern that describes what to upload
+          path: ./build
+            # optional, default is warn
+    # Duration after which artifact will expire in days. 0 means using default retention.
+#Minimum 1 day. Maximum 90 days unless changed from the repository settings page.
+          retention-days: 1
 
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v3.1.1
         with:
           version: 0.2
-          cmds: |
-                project update
-                do build
     # Artifact name
           name: artifact# optional, default is artifact
     # A file, directory or wildcard pattern that describes what to upload
